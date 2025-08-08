@@ -1,10 +1,20 @@
 import express from "express";
+import { nanoid } from "nanoid";
+import dotenv from "dotenv";
+import dbConfig from "./src/config/db.config.js";
+import urlSchema from "./src/models/shortUrl.model.js";
+import shortUrlRoute from "./src/routes/shortUrl.route.js";
+
+dotenv.config("./.env");
 const app = express();
 
-app.get("/api/create", (req, res) => {
-  res.send("Hello, World!");
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.listen(5000, () => {
-  console.log(`Server is running on port ${`http://localhost:5000`}`);
+dbConfig();
+
+app.post("/api/create", shortUrlRoute);
+
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`✅ Server is running on port ${process.env.PORT || 5000}`);
 });
