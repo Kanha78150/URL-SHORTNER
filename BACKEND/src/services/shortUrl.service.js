@@ -4,7 +4,7 @@ import { generateNanoId } from "../utils/generateNanoId.js";
 export const createShortUrlServiceWithoutUser = async (url) => {
   const shortUrl = await generateNanoId(7);
   if (!shortUrl) throw new Error("Short URL is not generated.");
-  await saveShortUrl(url, "3oPMBWC");
+  await saveShortUrl(url, shortUrl);
   return shortUrl;
 };
 
