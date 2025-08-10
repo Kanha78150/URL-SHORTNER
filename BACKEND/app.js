@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import dbConfig from "./src/config/db.config.js";
 import shortUrlRoute from "./src/routes/shortUrl.route.js";
 import { redirectFromShortUrl } from "./src/controllers/shortUrl.controller.js";
@@ -7,7 +8,7 @@ import { errorHandler } from "./src/utils/errorHandler.js";
 
 dotenv.config("./.env");
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
