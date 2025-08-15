@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { createShortURL } from "../api/shortUrl.api";
+import { useSelector } from "react-redux";
+import { queryClient } from "../main";
 
 const URLForm = () => {
   const [url, setUrl] = useState("");
@@ -7,24 +9,34 @@ const URLForm = () => {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [customSlug, setCustomSlug] = useState("");
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLoading) return; // Prevent double submission
+    setShortUrl("");
+    setIsLoading(true);
+    setError("");
     try {
-      const shortURL = await createShortURL(url);
-      setIsLoading(false);
+      const shortURL = await createShortURL(url, customSlug);
       setShortUrl(shortURL);
+      queryClient.invalidateQueries({
+        queryKey: ["userUrls"],
+      });
     } catch (error) {
       setIsLoading(false);
       setError(error || "Something went wrong. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handelButtonClick = (e) => {
-    if (url) {
+    e.preventDefault();
+    if (url && !isLoading) {
       handleSubmit(e);
     }
-    return;
   };
 
   const handleCopy = () => {
@@ -66,9 +78,29 @@ const URLForm = () => {
           {error}
         </div>
       )}
+      {isAuthenticated && (
+        <div>
+          <label
+            htmlFor="slug"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Custom URL (Optional)
+          </label>
+          <input
+            type="text"
+            id="customSlug"
+            value={customSlug}
+            onChange={(e) => setCustomSlug(e.target.value)}
+            placeholder="Enter custom slug"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+          />
+        </div>
+      )}
+
       <button
         type="submit"
         onClick={handelButtonClick}
+        disabled={isLoading || !url}
         className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
       >
         {isLoading ? (
@@ -96,14 +128,14 @@ const URLForm = () => {
             Shortening...
           </>
         ) : (
-          "Shorten URL"
+          "Shortly"
         )}
       </button>
       {shortUrl && (
         <div className="space-y-4 pt-4 border-t border-gray-200">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Your shortened URL
+              Your Shortly URL
             </label>
             <div className="flex items-center space-x-2">
               <input
@@ -159,7 +191,7 @@ const URLForm = () => {
             onClick={handleReset}
             className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
           >
-            Shorten Another URL
+            Shortly Another URL
           </button>
         </div>
       )}
