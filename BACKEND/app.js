@@ -16,7 +16,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173", // dev
-      "https://your-frontend.netlify.app", // production
+      "https://urlshrotnerapp.netlify.app/", // production
     ],
     credentials: true,
   })
