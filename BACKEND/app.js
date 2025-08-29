@@ -10,11 +10,14 @@ import { errorHandler } from "./src/utils/errorHandler.js";
 import { attachUser } from "./src/utils/attachUser.js";
 import cookieParser from "cookie-parser";
 
-dotenv.config("./.env");
+dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173", // dev
+      "https://your-frontend.netlify.app", // production
+    ],
     credentials: true,
   })
 );
